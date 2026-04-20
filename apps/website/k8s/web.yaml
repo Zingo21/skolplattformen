@@ -1,13 +1,8 @@
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: skolplattformen-web
----
-apiVersion: v1
 kind: Service
 metadata:
   name: skolplattformen-web
-  namespace: skolplattformen-web
+  namespace: skolplattformen
 spec:
   ports:
     - port: 3000
@@ -19,7 +14,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: skolplattformen-web
-  namespace: skolplattformen-web
+  namespace: skolplattformen
 spec:
   selector:
     matchLabels:
@@ -35,7 +30,7 @@ spec:
             requests:
               cpu: 100m
               memory: 100Mi
-          image: ghcr.io/kolplattformen/skolplattformen
+          image: ghcr.io/kolplattformen/skolplattformen # {"$imagepolicy": "flux-system:skolplattformen"}
           ports:
             - containerPort: 3000
 
@@ -57,21 +52,21 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: skolplattformen-web
-  namespace: skolplattformen-web
+  namespace: skolplattformen
   annotations:
     cert-manager.io/cluster-issuer: 'letsencrypt-prod'
     nginx.ingress.kubernetes.io/from-to-www-redirect: 'true'
     nginx.ingress.kubernetes.io/http2-push-preload: 'true'
     nginx.ingress.kubernetes.io/proxy-body-size: '500m'
     nginx.ingress.kubernetes.io/proxy-pass-headers: 'Location'
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_headers "X-Content-Type-Options: nosniff";
-      more_set_headers "X-Frame-Options: DENY";
-      more_set_headers "X-Xss-Protection: 0";
-      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
-      more_set_headers "Cross-Origin-Resource-Policy: same-site";
-      more_set_headers "Referrer-Policy strict-origin";
-    external-dns.alpha.kubernetes.io/hostname: new.skolplattformen.org.
+    # nginx.ingress.kubernetes.io/configuration-snippet: |
+    #   more_set_headers "X-Content-Type-Options: nosniff";
+    #   more_set_headers "X-Frame-Options: DENY";
+    #   more_set_headers "X-Xss-Protection: 0";
+    #   more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
+    #   more_set_headers "Cross-Origin-Resource-Policy: same-site";
+    #   more_set_headers "Referrer-Policy strict-origin";
+    external-dns.alpha.kubernetes.io/hostname: skolplattformen.org.
 
 spec:
   ingressClassName: nginx
